@@ -1,5 +1,10 @@
 {
   "name": "minecraft-server-logs",
+  "author": {
+    "name": "LordSequoia",
+    "email": "thelordsequoia@gmail.com",
+    "url": "https://github.com/lordsequoia"
+  },
   "version": "1.1.5",
   "description": "Library for parsing and streaming Minecraft logs",
   "main": "build/main/index.js",
@@ -7,7 +12,10 @@
   "module": "build/module/index.js",
   "repository": "https://github.com/lordsequoia/minecraft-server-logs",
   "license": "MIT",
-  "keywords": [],
+  "keywords": [
+    "minecraft",
+    "minecraft-logs"
+  ],
   "scripts": {
     "dev": "nodemon ./src/example.ts",
     "build": "run-p build:*",
