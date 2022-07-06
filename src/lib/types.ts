@@ -38,12 +38,18 @@ export type AnvilSavedEvent = {
     readonly dimension: string
 }
 
+export type ProgressEvent = {
+    readonly progress: string
+}
+
 export type LoggedEventData =
     | PlayerJoinedEvent
     | PlayerLeftEvent
     | ChatMessageEvent
     | AnvilSavedEvent
     | LifecycleEvent
+    | ProgressEvent
+    | unknown
 
 export type LoggedEventName = keyof typeof LOGGED_EVENT_PATTERNS
 
