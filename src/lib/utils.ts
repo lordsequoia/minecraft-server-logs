@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Tail, TailOptions } from 'tail';
 
 import { LOGGED_EVENT_PATTERNS, LOGGED_MESSAGE_PATTERN } from './constants';
-import { def, eq, evt, msg } from './operations';
+import { filterDef, filterEq, mapEvent, mapMessage } from './operations';
 import { LoggedEvent, LoggedEventName, LoggedMessage, LogLevel } from './types';
 
 /**
@@ -74,7 +74,7 @@ export const makeLines$ = (v: string | Observable<string>) =>
  * @returns A stream of @see LoggedMessage
  */
 export const makeMessages$ = (v: string | Observable<LoggedMessage>) =>
-  typeof v === 'string' ? makeLines$(v) : v.pipe(msg);
+  typeof v === 'string' ? makeLines$(v) : v.pipe(mapMessage);
 
 /**
  * Transform a path to a stream of @see Loggedevent or return the provided value if it is already a stream of @see LoggedEvent.
@@ -83,7 +83,7 @@ export const makeMessages$ = (v: string | Observable<LoggedMessage>) =>
  * @returns A stream of @see LoggedEvent
  */
 export const makeEvents$ = (v: string | Observable<string | LoggedMessage>) =>
-  (typeof v === 'string' ? makeLines$(v) : v).pipe(evt);
+  (typeof v === 'string' ? makeLines$(v) : v).pipe(mapEvent);
 
 /**
  * Stream logged lines from a logs file.
@@ -110,14 +110,17 @@ export const streamLoggedLines = (
  * @returns
  */
 export const streamLoggedMessages = (source: string | Observable<string>) =>
-  makeLines$(source).pipe(msg, def);
+  makeLines$(source).pipe(
+    mapMessage,
+    filterDef
+  );
 
 export const streamLoggedEvents = (
   source: string | Observable<LoggedMessage>
 ): Observable<LoggedEvent> =>
-  (typeof source === 'string' ? makeLines$(source).pipe(msg) : source).pipe(
-    evt,
-    def
+  (typeof source === 'string' ? makeLines$(source).pipe(mapMessage) : source).pipe(
+    mapEvent,
+    filterDef,
   );
 
 /**
@@ -132,7 +135,9 @@ export const streamLoggedEventsBy = (
   source: string | Observable<LoggedMessage>,
   key: keyof LoggedEvent,
   value: LoggedEvent[keyof LoggedEvent]
-) => streamLoggedEvents(source).pipe(eq(key, value));
+) => streamLoggedEvents(source).pipe(
+  filterEq(key, value)
+);
 
 /**
  * Stream logged events matching provided eventName.
