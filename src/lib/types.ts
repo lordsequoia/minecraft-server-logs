@@ -15,12 +15,18 @@ export type LoggedMessage = {
     readonly message: string
 }
 
-export type PlayerJoinedEvent = {
+export type PresenceEvent<T = 'joined' | 'left'> = {
     readonly playerName: string
+    readonly incident: T
 }
 
-export type PlayerLeftEvent = {
-    readonly playerName: string
+
+export type PlayerJoinedEvent = PresenceEvent<'joined'>
+export type PlayerLeftEvent = PresenceEvent<'left'>
+
+
+export type LifecycleEvent = {
+    readonly incident: string
 }
 
 export type ChatMessageEvent = {
@@ -28,10 +34,16 @@ export type ChatMessageEvent = {
     readonly messageContent: string
 }
 
+export type AnvilSavedEvent = {
+    readonly dimension: string
+}
+
 export type LoggedEventData =
     | PlayerJoinedEvent
     | PlayerLeftEvent
     | ChatMessageEvent
+    | AnvilSavedEvent
+    | LifecycleEvent
 
 export type LoggedEventName = keyof typeof LOGGED_EVENT_PATTERNS
 

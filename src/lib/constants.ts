@@ -5,8 +5,10 @@ export const LOGGED_MESSAGE_PATTERN = TypedRegEx('^\\[(?<hh>\\d{2}):(?<mm>\\d{2}
 export const LOGGED_EVENT_PATTERNS = {
     playerJoined: TypedRegEx('^(?<playerName>[\\w|\\W\\_]*) joined the game', 'g'),
     playerLeft: TypedRegEx('^(?<playerName>[\\w|\\W\\_]*) left the game', 'g'),
-    chatMessage: TypedRegEx('^\\<(?<playerName>[\\w|\\W]*)\\> (?<messageContent>[\\.*])', 'g'),
-    anvilSaved: TypedRegEx('^ThreadedAnvilChunkStorage \\((<?dimension>[\\w|\\W]*)\\): All chunks are saved', 'g'),
+    chatMessage: TypedRegEx('^<(?<playerName>[\\w|\\W]*)> (?<messageContent>[\\.*])', 'g'),
+    anvilSaved: TypedRegEx('ThreadedAnvilChunkStorage (<?dimension>[\\.]*): All chunks are saved', 'g'),
+    serverStarting: TypedRegEx('Starting minecraft server version (<?version>[\\.]*)', 'g'),
+    serverStarted: TypedRegEx('Time elapsed: (<?startupTime>\\d*) ms/m', 'g')
 }
 
 /*const serverLogTypes = {
