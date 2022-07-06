@@ -13,14 +13,3 @@ export const LOGGED_EVENT_PATTERNS = {
     anvilSaved: TypedRegEx('ThreadedAnvilChunkStorage (<?dimension>[\\.]*): All chunks are saved', 'g'),
     preparingSpawn: TypedRegEx('Preparing spawn area: (<?progress>[\\d]*)%', 'g'),
 }
-
-/*const serverLogTypes = {
-    serverStarting: { regex: /Starting minecraft server version (.*)/, groups: ['version'] },
-    serverStarted: { regex: /Time elapsed: (\d*) ms/m, groups: ['startupTime'] },
-    serverStopping: { regex: /Stopping the server/m, groups: [] },
-    serverStopped: { regex: /Stopped the server/m, groups: [] },
-    preparingSpawn: { regex: /Preparing spawn area: (\d*)%/, groups: ['progress'] },
-    playerJoined: { regex: /(.*) joined the game/m, groups: ['playerName'] },
-    playerLeft: { regex: /(.*) left the game/m, groups: ['playerName'] },
-    chatMessage: { regex: /<(.*)> (.*)/m, groups: ['playerName', 'messageContent'] },
-}*/

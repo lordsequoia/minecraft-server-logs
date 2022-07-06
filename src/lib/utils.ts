@@ -1,7 +1,7 @@
 /* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-loop-statement */
 import { filter, map, Observable } from "rxjs"
-import { Tail } from "tail"
+import { Tail, TailOptions } from "tail"
 
 import { LOGGED_EVENT_PATTERNS, LOGGED_MESSAGE_PATTERN } from "./constants"
 import { LoggedEvent, LoggedMessage, LogLevel } from "./types"
@@ -41,23 +41,31 @@ export const createLoggedEvent = (message?: string | LoggedMessage): LoggedEvent
     return undefined
 }
 
-export const streamLoggedLines = (source: string): Observable<string> =>
-    new Observable<string>(subscriber => {
-        const { on } = new Tail(source)
+export const asMessage = map((v: string | LoggedMessage) => typeof v !== 'string' ? v : createLoggedMessage(v))
+export const asEvent = map((v?: LoggedMessage | LoggedEvent) =>
+    typeof v === undefined ? undefined : (typeof Object.assign({ eventName: undefined }, v).eventName === undefined ? createLoggedEvent(v) : v))
 
-        on('line', v => subscriber.next(v))
-        on('error', v => subscriber.error(v))
+export const isDefined = filter((v?: LoggedEvent) => v !== undefined)
+
+export const makeLines$ = (v: string | Observable<string>) =>
+    typeof v === 'string' ? streamLoggedLines(v) : v
+
+export const makeMessages$ = (v: string | Observable<string | LoggedMessage>) =>
+    typeof v === 'string' ? makeLines$(v) : v.pipe(asMessage)
+
+export const makeEvents$ = (v: string | Observable<string | LoggedMessage>) =>
+    (typeof v === 'string' ? makeLines$(v) : v).pipe(asMessage, asEvent)
+
+export const streamLoggedLines = (source: string, options?: TailOptions): Observable<string> =>
+    new Observable<string>(subscriber => {
+        const source$ = new Tail(source, options)
+
+        source$.on('line', v => subscriber.next(v))
+        source$.on('error', v => subscriber.error(v))
     })
 
 export const streamLoggedMessages = (source: string | Observable<string>) =>
-    (typeof source === 'string' ? streamLoggedLines(source) : source)
-        .pipe(
-            map(v => createLoggedMessage(v))
-        )
+    makeLines$(source).pipe(asMessage, isDefined)
 
-export const streamEvents = (source: string | Observable<string | LoggedMessage>): Observable<LoggedEvent> =>
-    (typeof source === 'string' ? streamLoggedLines(source) : source)
-        .pipe(
-            map(v => createLoggedEvent(v)),
-            filter(v => v !== undefined)
-        )
+export const streamLoggedEvents = (source: string | Observable<string | LoggedMessage>): Observable<LoggedEvent> =>
+    makeEvents$(source).pipe(asMessage, asEvent, isDefined)

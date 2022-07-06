@@ -53,6 +53,6 @@ export type LoggedEventData =
 
 export type LoggedEventName = keyof typeof LOGGED_EVENT_PATTERNS
 
-export type LoggedEvent = LoggedMessage & LoggedEventData & {
+export type LoggedEvent<T = LoggedEventData | unknown> = LoggedMessage & T & {
     readonly eventName: LoggedEventName
 }
