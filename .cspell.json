@@ -22,7 +22,10 @@
     "transpiled",
     "typedoc",
     "untracked",
-    "minecraft"
+    "minecraft",
+    "loglevel",
+    "Loggedevent",
+    "parseable"
   ],
   "flagWords": [],
   "ignorePaths": [
