@@ -1,10 +1,11 @@
 /* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-loop-statement */
-import { filter, map, Observable } from "rxjs"
+import { Observable } from "rxjs"
 import { Tail, TailOptions } from "tail"
 
 import { LOGGED_EVENT_PATTERNS, LOGGED_MESSAGE_PATTERN } from "./constants"
-import { LoggedEvent, LoggedMessage, LogLevel } from "./types"
+import { def, eq, evt, msg } from "./operations"
+import { LoggedEvent, LoggedEventName, LoggedMessage, LogLevel } from "./types"
 
 export const createLoggedMessage = (rawLog: string): LoggedMessage | undefined => {
     const parsed = LOGGED_MESSAGE_PATTERN.captures(rawLog)
@@ -41,20 +42,14 @@ export const createLoggedEvent = (message?: string | LoggedMessage): LoggedEvent
     return undefined
 }
 
-export const asMessage = map((v: string | LoggedMessage) => typeof v !== 'string' ? v : createLoggedMessage(v))
-export const asEvent = map((v?: LoggedMessage | LoggedEvent) =>
-    typeof v === undefined ? undefined : (typeof Object.assign({ eventName: undefined }, v).eventName === undefined ? createLoggedEvent(v) : v))
-
-export const isDefined = filter((v?: LoggedEvent) => v !== undefined)
-
 export const makeLines$ = (v: string | Observable<string>) =>
     typeof v === 'string' ? streamLoggedLines(v) : v
 
-export const makeMessages$ = (v: string | Observable<string | LoggedMessage>) =>
-    typeof v === 'string' ? makeLines$(v) : v.pipe(asMessage)
+export const makeMessages$ = (v: string | Observable<LoggedMessage>) =>
+    typeof v === 'string' ? makeLines$(v) : v.pipe(msg)
 
 export const makeEvents$ = (v: string | Observable<string | LoggedMessage>) =>
-    (typeof v === 'string' ? makeLines$(v) : v).pipe(asMessage, asEvent)
+    (typeof v === 'string' ? makeLines$(v) : v).pipe(evt)
 
 export const streamLoggedLines = (source: string, options?: TailOptions): Observable<string> =>
     new Observable<string>(subscriber => {
@@ -65,7 +60,13 @@ export const streamLoggedLines = (source: string, options?: TailOptions): Observ
     })
 
 export const streamLoggedMessages = (source: string | Observable<string>) =>
-    makeLines$(source).pipe(asMessage, isDefined)
+    makeLines$(source).pipe(msg, def)
 
-export const streamLoggedEvents = (source: string | Observable<string | LoggedMessage>): Observable<LoggedEvent> =>
-    makeEvents$(source).pipe(asMessage, asEvent, isDefined)
+export const streamLoggedEvents = (source: string | Observable<LoggedMessage>): Observable<LoggedEvent> =>
+    (typeof source === 'string' ? makeLines$(source).pipe(msg) : source).pipe(evt, def)
+
+export const streamLoggedEventsBy = (source: string | Observable<LoggedMessage>, key: keyof LoggedEvent, value: LoggedEvent[keyof LoggedEvent]) =>
+    streamLoggedEvents(source).pipe(eq(key, value))
+
+export const streamLoggedEventsNamed = (source: string | Observable<LoggedMessage>, eventName: LoggedEventName) =>
+    streamLoggedEventsBy(source, 'eventName', eventName)
