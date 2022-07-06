@@ -9,7 +9,7 @@ import { LoggedEvent, LoggedEventName, LoggedMessage, LogLevel } from './types';
 
 /**
  * Parses a logged message from a logged line.
- * 
+ *
  * @param rawLog a logged line as string
  * @returns a log message of type @see LoggedMessage
  */
@@ -32,7 +32,7 @@ export const createLoggedMessage = (
 
 /**
  * Parses a logged event from a logged message.
- * 
+ *
  * @param message The @see LoggedMessage to parse.
  * @returns An object shaped as @see LoggedEvent
  */
@@ -60,7 +60,7 @@ export const createLoggedEvent = (
 
 /**
  * Transform a path to a stream of @see string or return the provided value if it is already a stream of @see string.
- * 
+ *
  * @param v A filepath or stream of @see string.
  * @returns A stream of @see string
  */
@@ -69,7 +69,7 @@ export const makeLines$ = (v: string | Observable<string>) =>
 
 /**
  * Transform a path to a stream of @see LoggedMessage or return the provided value if it is already a stream of @see LoggedMessage.
- * 
+ *
  * @param v a filepath or stream of @see LoggedMessage
  * @returns A stream of @see LoggedMessage
  */
@@ -78,7 +78,7 @@ export const makeMessages$ = (v: string | Observable<LoggedMessage>) =>
 
 /**
  * Transform a path to a stream of @see Loggedevent or return the provided value if it is already a stream of @see LoggedEvent.
- * 
+ *
  * @param v a filepath or stream of @see LoggedEvent
  * @returns A stream of @see LoggedEvent
  */
@@ -87,11 +87,11 @@ export const makeEvents$ = (v: string | Observable<string | LoggedMessage>) =>
 
 /**
  * Stream logged lines from a logs file.
- * 
+ *
  * @param source The path of a logs file.
  * @param options Options to provide to Tail. @see TailOptions
  * @returns A stream of logged lines (string)
-*/
+ */
 export const streamLoggedLines = (
   source: string,
   options?: TailOptions
@@ -105,9 +105,9 @@ export const streamLoggedLines = (
 
 /**
  * Stream logged messages.
- * 
+ *
  * @param source The path of a logs file or an Observable<string>
- * @returns 
+ * @returns
  */
 export const streamLoggedMessages = (source: string | Observable<string>) =>
   makeLines$(source).pipe(msg, def);
@@ -122,7 +122,7 @@ export const streamLoggedEvents = (
 
 /**
  * Stream logged events matching the provided value for the provided key.
- * 
+ *
  * @param source The path of a logs file or an Observable<string>
  * @param key Filter key
  * @param value Value to match for the provided key
@@ -136,7 +136,7 @@ export const streamLoggedEventsBy = (
 
 /**
  * Stream logged events matching provided eventName.
- * 
+ *
  * @param source The path of a logs file or an Observable<string>
  * @param eventName a key of @see LOGGED_EVENT_PATTERNS
  * @returns A subset of the source stream
