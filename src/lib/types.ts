@@ -1,13 +1,14 @@
 import { LOGGED_EVENT_PATTERNS } from './constants';
 
+/**
+ * The loglevel of a @see LoggedMessage
+ */
 export type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
 
-export type LogTimestamp = {
-    readonly hh: string;
-    readonly mm: string;
-    readonly ss: string;
-};
-
+/**
+ * A logged message.
+ * 
+ */
 export type LoggedMessage = {
     readonly timestamp: string;
     readonly thread: string;
@@ -15,47 +16,64 @@ export type LoggedMessage = {
     readonly message: string;
 };
 
+/**
+ * A player presence event (@see PlayerJoinedEvent or @see PlayerLeftEvent)
+ */
 export type PresenceEvent<T = 'joined' | 'left'> = {
     readonly playerName: string;
     readonly incident: T;
 };
 
+/**
+ * A player joined the game.
+ */
 export type PlayerJoinedEvent = PresenceEvent<'joined'>;
+
+/**
+ * A player left the game.
+ */
 export type PlayerLeftEvent = PresenceEvent<'left'>;
 
-export type LifecycleEvent = {
-    readonly incident: string;
-};
-
+/**
+ * A chat message was sent.
+ */
 export type ChatMessageEvent = {
     readonly playerName: string;
     readonly messageContent: string;
 };
 
+/**
+ * Anvil storage has saved the world's chunks.
+ */
 export type AnvilSavedEvent = {
     readonly dimension: string;
 };
 
+/**
+ * Preparing spawn progress (in %).
+ */
 export type ProgressEvent = {
     readonly progress: string;
 };
 
+/**
+ * All shapes of events parseable using this lib.
+ */
 export type LoggedEventData =
     | PlayerJoinedEvent
     | PlayerLeftEvent
     | ChatMessageEvent
     | AnvilSavedEvent
-    | LifecycleEvent
     | ProgressEvent
     | unknown;
 
 /**
- * Logged event name
+ * A logged event name, which is a key of @see LOGGED_EVENT_PATTERNS
  */
 export type LoggedEventName = keyof typeof LOGGED_EVENT_PATTERNS;
 
 /**
- * 
+ * A logged event.
  */
 export type LoggedEvent<T = LoggedEventData | unknown> = LoggedMessage &
     T & {
