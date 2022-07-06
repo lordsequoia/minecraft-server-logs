@@ -1,5 +1,8 @@
 /* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-loop-statement */
+import { filter, map, Observable } from "rxjs"
+import { Tail } from "tail"
+
 import { LOGGED_EVENT_PATTERNS, LOGGED_MESSAGE_PATTERN } from "./constants"
 import { LoggedEvent, LoggedMessage, LogLevel } from "./types"
 
@@ -37,3 +40,24 @@ export const createLoggedEvent = (message?: string | LoggedMessage): LoggedEvent
 
     return undefined
 }
+
+export const streamLoggedLines = (source: string): Observable<string> =>
+    new Observable<string>(subscriber => {
+        const { on } = new Tail(source)
+
+        on('line', v => subscriber.next(v))
+        on('error', v => subscriber.error(v))
+    })
+
+export const streamLoggedMessages = (source: string | Observable<string>) =>
+    (typeof source === 'string' ? streamLoggedLines(source) : source)
+        .pipe(
+            map(v => createLoggedMessage(v))
+        )
+
+export const streamEvents = (source: string | Observable<string | LoggedMessage>): Observable<LoggedEvent> =>
+    (typeof source === 'string' ? streamLoggedLines(source) : source)
+        .pipe(
+            map(v => createLoggedEvent(v)),
+            filter(v => v !== undefined)
+        )

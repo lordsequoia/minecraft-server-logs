@@ -45,6 +45,8 @@
   "dependencies": {
     "@bitauth/libauth": "^1.17.1",
     "fs-extra": "^10.1.0",
+    "rxjs": "^7.5.5",
+    "tail": "^2.2.4",
     "type-fest": "^2.16.0",
     "typed-regex": "^0.0.8"
   },
@@ -52,6 +54,7 @@
     "@ava/typescript": "^1.1.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/fs-extra": "^9.0.13",
+    "@types/tail": "^2.2.1",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
     "ava": "^3.12.1",
