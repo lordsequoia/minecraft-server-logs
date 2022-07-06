@@ -110,18 +110,15 @@ export const streamLoggedLines = (
  * @returns
  */
 export const streamLoggedMessages = (source: string | Observable<string>) =>
-  makeLines$(source).pipe(
-    mapMessage,
-    filterDef
-  );
+  makeLines$(source).pipe(mapMessage, filterDef);
 
 export const streamLoggedEvents = (
   source: string | Observable<LoggedMessage>
 ): Observable<LoggedEvent> =>
-  (typeof source === 'string' ? makeLines$(source).pipe(mapMessage) : source).pipe(
-    mapEvent,
-    filterDef,
-  );
+  (typeof source === 'string'
+    ? makeLines$(source).pipe(mapMessage)
+    : source
+  ).pipe(mapEvent, filterDef);
 
 /**
  * Stream logged events matching the provided value for the provided key.
@@ -135,9 +132,7 @@ export const streamLoggedEventsBy = (
   source: string | Observable<LoggedMessage>,
   key: keyof LoggedEvent,
   value: LoggedEvent[keyof LoggedEvent]
-) => streamLoggedEvents(source).pipe(
-  filterEq(key, value)
-);
+) => streamLoggedEvents(source).pipe(filterEq(key, value));
 
 /**
  * Stream logged events matching provided eventName.
