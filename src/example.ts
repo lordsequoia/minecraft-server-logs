@@ -1,4 +1,10 @@
+/* eslint-disable functional/no-loop-statement */
+import { join } from 'path'
+
+import { readFileSync } from "fs-extra";
 import { TypedRegEx } from "typed-regex";
+
+import { createLoggedEvent, createLoggedMessage } from './lib/utils';
 
 export const startDemo0 = () => {
     const regex = TypedRegEx('\\[?<p1>(.*)\\] ?<p2>\\[?<p3>(.*)/?<p4>(.*)\\]: ?<p5>(.*)', 'g');
@@ -68,6 +74,22 @@ export const startDemo7 = () => {
     console.dir(result) // : undefined | { year: string, month: string, day: string }
 }
 
+export const startDemo8 = () => {
+    const sampleLogs = String(readFileSync(join(process.cwd(), 'sample.log')))
+
+    for (const sampleLog of sampleLogs.split('\n')) {
+        const message = createLoggedMessage(sampleLog)
+        const event = createLoggedEvent(message)
+
+        if (event === undefined) {
+            console.log(`[....] ${sampleLog}`)
+        } else {
+            console.log(`[${event.eventName}] ${JSON.stringify(event.message)}`, event)
+        }
+    }
+}
+
 startDemo0()
 startDemo6()
 startDemo7()
+startDemo8()
