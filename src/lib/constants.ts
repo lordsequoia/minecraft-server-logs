@@ -22,15 +22,15 @@ export const LOGGED_EVENT_PATTERNS = {
     'g'
   ),
   serverStarting: TypedRegEx(
-    'Starting minecraft server version (<?version>[\\.]*)',
+    'Starting minecraft server version (?<version>[\\.]*)',
     'g'
   ),
-  serverStarted: TypedRegEx('Time elapsed: (<?startupTime>\\d*) ms/m', 'g'),
+  serverStarted: TypedRegEx('Time elapsed: (?<startupTime>\\d*) ms/m', 'g'),
   serverStopping: TypedRegEx('Stopping the server', 'g'),
   serverStopped: TypedRegEx('Stopped the server', 'g'),
   anvilSaved: TypedRegEx(
-    'ThreadedAnvilChunkStorage (<?dimension>[\\.]*): All chunks are saved',
+    'ThreadedAnvilChunkStorage (?<dimension>[\\.]*): All chunks are saved',
     'g'
   ),
-  preparingSpawn: TypedRegEx('Preparing spawn area: (<?progress>[\\d]*)%', 'g'),
+  preparingSpawn: TypedRegEx('Preparing spawn area: (?<progress>[\\d]*)%', 'g'),
 };
