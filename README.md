@@ -107,6 +107,71 @@ presence$.subscribe(({ eventName, timestamp, playerName }) => {
 });
 ```
 
+```js
+const { openSync, appendFileSync } = require('fs');
+const {
+  createLoggedMessage,
+  createLoggedEvent,
+  streamLoggedMessages,
+  streamLoggedEvents,
+  filterEq,
+  streamLoggedEventsNamed,
+} = require('minecraft-server-logs');
+const { of, interval } = require('rxjs');
+
+const HELLO_WORLD =
+  '[00:00:00] [Dummy thread/INFO]: LordSequoia joined the game';
+
+const message = createLoggedMessage(HELLO_WORLD);
+const event = createLoggedEvent(message);
+console.dir({ rawLog: HELLO_WORLD, message, event });
+
+const rawLogs = of(
+  '[00:00:00] [Foo thread/INFO]: Server starting',
+  '[00:00:00] [Dummy thread/INFO]: Hello world!',
+  '[00:00:01] [Server thread/INFO]: LordSequoia joined the game',
+  '[00:00:02] [Server thread/INFO]: Starting minecraft server version (1.19)',
+  '[00:00:03] [Dummy thread/INFO]: <LordSequoia> Hello world!',
+  '[00:00:01] [Server thread/INFO]: LordSequoia left the game'
+);
+
+// const rawLogs = './logs/latest.log'
+const messages$ = streamLoggedMessages(rawLogs);
+const events$ = streamLoggedEvents(rawLogs);
+
+messages$.subscribe(({ timestamp, thread, level, message }) =>
+  console.log(`[${level}] ${timestamp}: ${message}`)
+);
+
+events$.subscribe((v) => console.log(`[EVENT] ${v.eventName}`));
+
+const playerJoined$ = events$.pipe(filterEq('eventName', 'playerJoined'));
+
+playerJoined$.subscribe(({ timestamp, playerName }) =>
+  console.log(`${timestamp} ${playerName} joined!`)
+);
+
+const playerLeft$ = streamLoggedEventsNamed(rawLogs, 'playerLeft');
+
+playerLeft$.subscribe(({ timestamp, playerName }) =>
+  console.log(`${timestamp} ${playerName} left :(`)
+);
+
+const serverEvents$ = streamLoggedEvents('./logs/latest.log');
+serverEvents$.subscribe((v) =>
+  console.log(`[REAL-TIME] ${v.eventName} -> ${v.message}`)
+);
+
+const appendLog = (rawLog) => {
+  const appendOpts = { encoding: 'utf-8', flag: 'w' };
+  appendFileSync('./logs/latest.log', '\n' + rawLog, appendOpts);
+};
+
+interval(3 * 1000).subscribe((v) =>
+  appendLog(`[00:00:03] [Dummy thread/INFO]: <LordSequoia> Hello world ${v}!`)
+);
+```
+
 ## Running tests
 
 Install dev dependencies:
