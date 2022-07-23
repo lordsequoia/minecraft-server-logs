@@ -16,20 +16,20 @@ export const LOGGED_EVENT_PATTERNS = {
     '^(?<playerName>[\\w|\\W\\_]*) joined the game',
     'g'
   ),
-  playerLeft: TypedRegEx('^(?<playerName>[\\w|\\W\\_]*) left the game', 'g'),
+  playerLeft: TypedRegEx('^(?<playerName>[\\w|\\W|\\_]*) left the game', 'g'),
   chatMessage: TypedRegEx(
-    '^<(?<playerName>[\\w|\\W]*)> (?<messageContent>[\\.*])',
+    '^<(?<playerName>[\\w|\\W]*)> (?<messageContent>[\\w|\\W|\\_|\\d||\\s]*)',
     'g'
   ),
   serverStarting: TypedRegEx(
-    'Starting minecraft server version (?<version>[\\.]*)',
+    'Starting minecraft server version (?<version>[\\.|\\d]*)',
     'g'
   ),
-  serverStarted: TypedRegEx('Time elapsed: (?<startupTime>\\d*) ms/m', 'g'),
+  serverStarted: TypedRegEx('Time elapsed: (?<startupTime>[\\d]*) ms/m', 'g'),
   serverStopping: TypedRegEx('Stopping the server', 'g'),
   serverStopped: TypedRegEx('Stopped the server', 'g'),
   anvilSaved: TypedRegEx(
-    'ThreadedAnvilChunkStorage (?<dimension>[\\.]*): All chunks are saved',
+    'ThreadedAnvilChunkStorage \\((?<dimension>[\\w|\\W|\\:|]*)\\): All chunks are saved',
     'g'
   ),
   preparingSpawn: TypedRegEx('Preparing spawn area: (?<progress>[\\d]*)%', 'g'),
