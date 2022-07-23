@@ -161,6 +161,69 @@ presence$.subscribe(<span class="hljs-function">(<span class="hljs-params">{ eve
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`[<span class="hljs-subst">${timestamp}</span>] <span class="hljs-subst">${eventName}</span>(<span class="hljs-subst">${playerName}</span>)`</span>);
 });
 </code></pre>
+				<pre><code class="language-js"><span class="hljs-keyword">const</span> { openSync, appendFileSync } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
+<span class="hljs-keyword">const</span> {
+  createLoggedMessage,
+  createLoggedEvent,
+  streamLoggedMessages,
+  streamLoggedEvents,
+  filterEq,
+  streamLoggedEventsNamed,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;minecraft-server-logs&#x27;</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-keyword">of</span>, interval } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;rxjs&#x27;</span>);
+
+<span class="hljs-keyword">const</span> HELLO_WORLD =
+  <span class="hljs-string">&#x27;[00:00:00] [Dummy thread/INFO]: LordSequoia joined the game&#x27;</span>;
+
+<span class="hljs-keyword">const</span> message = createLoggedMessage(HELLO_WORLD);
+<span class="hljs-keyword">const</span> event = createLoggedEvent(message);
+<span class="hljs-built_in">console</span>.dir({ <span class="hljs-attr">rawLog</span>: HELLO_WORLD, message, event });
+
+<span class="hljs-keyword">const</span> rawLogs = <span class="hljs-keyword">of</span>(
+  <span class="hljs-string">&#x27;[00:00:00] [Foo thread/INFO]: Server starting&#x27;</span>,
+  <span class="hljs-string">&#x27;[00:00:00] [Dummy thread/INFO]: Hello world!&#x27;</span>,
+  <span class="hljs-string">&#x27;[00:00:01] [Server thread/INFO]: LordSequoia joined the game&#x27;</span>,
+  <span class="hljs-string">&#x27;[00:00:02] [Server thread/INFO]: Starting minecraft server version (1.19)&#x27;</span>,
+  <span class="hljs-string">&#x27;[00:00:03] [Dummy thread/INFO]: &lt;LordSequoia&gt; Hello world!&#x27;</span>,
+  <span class="hljs-string">&#x27;[00:00:01] [Server thread/INFO]: LordSequoia left the game&#x27;</span>
+);
+
+<span class="hljs-comment">// const rawLogs = &#x27;./logs/latest.log&#x27;</span>
+<span class="hljs-keyword">const</span> messages$ = streamLoggedMessages(rawLogs);
+<span class="hljs-keyword">const</span> events$ = streamLoggedEvents(rawLogs);
+
+messages$.subscribe(<span class="hljs-function">(<span class="hljs-params">{ timestamp, thread, level, message }</span>) =&gt;</span>
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`[<span class="hljs-subst">${level}</span>] <span class="hljs-subst">${timestamp}</span>: <span class="hljs-subst">${message}</span>`</span>)
+);
+
+events$.subscribe(<span class="hljs-function">(<span class="hljs-params">v</span>) =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`[EVENT] <span class="hljs-subst">${v.eventName}</span>`</span>));
+
+<span class="hljs-keyword">const</span> playerJoined$ = events$.pipe(filterEq(<span class="hljs-string">&#x27;eventName&#x27;</span>, <span class="hljs-string">&#x27;playerJoined&#x27;</span>));
+
+playerJoined$.subscribe(<span class="hljs-function">(<span class="hljs-params">{ timestamp, playerName }</span>) =&gt;</span>
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`<span class="hljs-subst">${timestamp}</span> <span class="hljs-subst">${playerName}</span> joined!`</span>)
+);
+
+<span class="hljs-keyword">const</span> playerLeft$ = streamLoggedEventsNamed(rawLogs, <span class="hljs-string">&#x27;playerLeft&#x27;</span>);
+
+playerLeft$.subscribe(<span class="hljs-function">(<span class="hljs-params">{ timestamp, playerName }</span>) =&gt;</span>
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`<span class="hljs-subst">${timestamp}</span> <span class="hljs-subst">${playerName}</span> left :(`</span>)
+);
+
+<span class="hljs-keyword">const</span> serverEvents$ = streamLoggedEvents(<span class="hljs-string">&#x27;./logs/latest.log&#x27;</span>);
+serverEvents$.subscribe(<span class="hljs-function">(<span class="hljs-params">v</span>) =&gt;</span>
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`[REAL-TIME] <span class="hljs-subst">${v.eventName}</span> -&gt; <span class="hljs-subst">${v.message}</span>`</span>)
+);
+
+<span class="hljs-keyword">const</span> appendLog = <span class="hljs-function">(<span class="hljs-params">rawLog</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> appendOpts = { <span class="hljs-attr">encoding</span>: <span class="hljs-string">&#x27;utf-8&#x27;</span>, <span class="hljs-attr">flag</span>: <span class="hljs-string">&#x27;w&#x27;</span> };
+  appendFileSync(<span class="hljs-string">&#x27;./logs/latest.log&#x27;</span>, <span class="hljs-string">&#x27;\n&#x27;</span> + rawLog, appendOpts);
+};
+
+interval(<span class="hljs-number">3</span> * <span class="hljs-number">1000</span>).subscribe(<span class="hljs-function">(<span class="hljs-params">v</span>) =&gt;</span>
+  appendLog(<span class="hljs-string">`[00:00:03] [Dummy thread/INFO]: &lt;LordSequoia&gt; Hello world <span class="hljs-subst">${v}</span>!`</span>)
+);
+</code></pre>
 				<a href="#running-tests" id="running-tests" style="color: inherit; text-decoration: none;">
 					<h2>Running tests</h2>
 				</a>
